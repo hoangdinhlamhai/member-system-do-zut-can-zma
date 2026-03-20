@@ -1,5 +1,6 @@
 import { atom } from 'jotai';
 import { api } from '../services/api';
+import { performZaloAuth } from '../services/zalo-auth';
 
 // Định nghĩa types
 export interface MemberInfo {
@@ -36,7 +37,46 @@ export const isAuthLoadingAtom = atom<boolean>(true);
 // --- Actions (Derived atoms cho logic) ---
 
 /**
- * Logic thực hiện Phone Login
+ * Zalo OAuth Login — Flow chính cho ZMA
+ * 1. SDK authorize + getAccessToken + getPhoneNumber
+ * 2. POST /auth/zalo-login → backend decode phone, create/link member
+ * 3. Lưu token + member info
+ */
+export const zaloLoginActionAtom = atom(
+  null,
+  async (get, set, { refCode }: { refCode?: string } = {}) => {
+    try {
+      // Step 1: Zalo SDK flow
+      const { accessToken: zaloAccessToken, phoneToken } = await performZaloAuth();
+
+      // Step 2: Gọi backend
+      const response = await api.post('/auth/zalo-login', {
+        accessToken: zaloAccessToken,
+        phoneToken,
+        refCode: refCode || undefined,
+      });
+
+      const data = response.data;
+
+      // Step 3: Lưu state (Zalo login luôn là member)
+      localStorage.setItem('accessToken', data.accessToken);
+      localStorage.setItem('userType', 'member');
+
+      set(tokenAtom, data.accessToken);
+      set(userTypeAtom, 'member');
+      set(memberAtom, data.member);
+      set(staffAtom, null);
+
+      return data; // { accessToken, userType: 'member', member, isNewUser }
+    } catch (error) {
+      console.error('Lỗi Zalo OAuth login:', error);
+      throw error;
+    }
+  }
+);
+
+/**
+ * Logic thực hiện Phone Login (fallback)
  * Backend sẽ trả về userType: 'member' | 'staff'
  * FE dựa vào đó để redirect đúng UI
  */
