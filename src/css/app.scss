@@ -1,0 +1,123 @@
+@import 'variables.scss';
+
+/* ═══════════════════════════════════════════════════════
+   Global Styles — Zô Dứt Cạn Member App
+   ═══════════════════════════════════════════════════════ */
+
+/* ─── Google Fonts ──────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&family=Playfair+Display:wght@600;700;800&display=swap');
+
+/* ─── Base ──────────────────────────────────────────── */
+body {
+  @apply bg-cream text-text-main font-sans antialiased;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.page {
+  @apply p-0;
+}
+
+/* ─── Glass Effect ──────────────────────────────────── */
+.glass-effect {
+  @apply bg-white/80 border border-white/40 shadow-soft;
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+}
+
+[zaui-theme="dark"] .glass-effect {
+  @apply bg-dark-surface/80 shadow-glass-dark;
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+/* ─── Text Gradient ─────────────────────────────────── */
+.text-gradient {
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-gradient-gold {
+  background: var(--gradient-gold);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ─── Card Styles ───────────────────────────────────── */
+.card {
+  @apply bg-white rounded-2xl shadow-soft border border-black/[0.03] transition-all duration-300 ease-spring;
+}
+.card:hover {
+  @apply shadow-card;
+}
+
+.card-elevated {
+  @apply bg-white rounded-3xl shadow-card border border-black/[0.04];
+}
+
+/* ─── Section Container ─────────────────────────────── */
+.section-container {
+  @apply p-4 bg-surface rounded-2xl mb-6 shadow-soft;
+}
+
+/* ─── Skeleton Shimmer ──────────────────────────────── */
+.skeleton {
+  @apply rounded-xl;
+  background: linear-gradient(90deg, #f0e6da 25%, #faf5ef 50%, #f0e6da 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s linear infinite;
+}
+
+/* ─── Smooth scrollbar ──────────────────────────────── */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-primary/20 rounded-full;
+}
+
+/* ─── Focus Ring ────────────────────────────────────── */
+*:focus-visible {
+  outline: 2px solid #C8956C;
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+/* ─── Selection ─────────────────────────────────────── */
+::selection {
+  @apply bg-primary/20 text-text-main;
+}
+
+/* ─── Dark Mode Overrides ───────────────────────────── */
+[zaui-theme="dark"] body {
+  @apply bg-dark-bg text-dark-text;
+}
+
+[zaui-theme="dark"] .section-container {
+  @apply bg-dark-surface;
+}
+
+[zaui-theme="dark"] .card {
+  @apply bg-dark-surface border-dark-border;
+}
+
+[zaui-theme="dark"] .card-elevated {
+  @apply bg-dark-card border-dark-border;
+}
+
+[zaui-theme="dark"] .skeleton {
+  background: linear-gradient(90deg, #2E2722 25%, #3A332D 50%, #2E2722 75%);
+  background-size: 200% 100%;
+}
+
+[zaui-theme="dark"] ::-webkit-scrollbar-thumb {
+  @apply bg-primary/10;
+}
+
+
+

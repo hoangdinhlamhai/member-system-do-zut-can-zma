@@ -1,0 +1,20 @@
+/* CSS Variables — values Tailwind can't express directly */
+:root {
+  /* Tier Gradients */
+  --gradient-bronze: linear-gradient(135deg, #B87B4F 0%, #946035 100%);
+  --gradient-silver: linear-gradient(135deg, #9EAAAF 0%, #788488 100%);
+  --gradient-gold: linear-gradient(135deg, #D4A840 0%, #B58E2A 100%);
+  --gradient-platinum: linear-gradient(135deg, #8393A0 0%, #617280 100%);
+
+  /* Brand gradients */
+  --gradient-primary: linear-gradient(135deg, #C8956C 0%, #A07248 100%);
+  --gradient-warm: linear-gradient(135deg, #FBF7F2 0%, #F2E6D9 100%);
+  --gradient-hero: linear-gradient(160deg, #5B3A29 0%, #7D5A42 40%, #C8956C 100%);
+
+  /* Staff gradients */
+  --gradient-staff: linear-gradient(135deg, #5B3A29 0%, #8B6348 50%, #C8956C 100%);
+
+  /* Spacing for safe areas */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}

@@ -1,0 +1,170 @@
+/* ═══════════════════════════════════════════════════════
+   Staff App — Custom CSS
+   Refined warm design for F&B staff mini-app
+   ═══════════════════════════════════════════════════════ */
+
+/* ─── Staff Header ──────────────────────────────────── */
+.staff-header {
+  background: var(--gradient-staff);
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+}
+.staff-header::before {
+  content: '';
+  position: absolute;
+  top: -30%;
+  right: -15%;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+  pointer-events: none;
+}
+.staff-header::after {
+  content: '';
+  position: absolute;
+  bottom: -40%;
+  left: -10%;
+  width: 180px;
+  height: 180px;
+  background: radial-gradient(circle, rgba(255,255,255,0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* ─── Menu Card ─────────────────────────────────────── */
+.staff-menu-card {
+  @apply bg-white rounded-2xl p-5 flex flex-col items-center justify-center gap-3
+         shadow-soft border border-black/[0.03]
+         transition-all duration-300 ease-spring cursor-pointer;
+  min-height: 140px;
+}
+.staff-menu-card:hover {
+  @apply shadow-card;
+  transform: translateY(-2px);
+}
+.staff-menu-card:active {
+  @apply shadow-soft;
+  transform: scale(0.97);
+}
+.staff-menu-card .menu-icon {
+  @apply w-14 h-14 rounded-2xl flex items-center justify-center text-white text-2xl shadow-sm;
+}
+
+/* ─── Voucher Bottom Sheet ──────────────────────────── */
+.voucher-sheet-row {
+  @apply flex justify-between items-center py-3;
+}
+.voucher-sheet-row + .voucher-sheet-row {
+  border-top: 1px solid rgba(42, 31, 24, 0.06);
+}
+.voucher-sheet-label {
+  @apply text-text-muted text-sm;
+}
+.voucher-sheet-value {
+  @apply font-semibold text-text-main text-sm;
+}
+
+/* ─── Bill Card ─────────────────────────────────────── */
+.bill-card {
+  @apply bg-white rounded-2xl p-4 mb-3 shadow-soft border border-black/[0.03]
+         transition-all duration-300 ease-spring cursor-pointer;
+}
+.bill-card:hover {
+  @apply shadow-card;
+  transform: translateY(-1px);
+}
+.bill-card:active {
+  transform: scale(0.98);
+}
+
+/* ─── Status Badge ──────────────────────────────────── */
+.status-badge {
+  @apply px-2.5 py-1 rounded-full text-xs font-semibold inline-flex items-center gap-1;
+}
+.status-badge.pending {
+  @apply bg-warning-light text-warning;
+}
+.status-badge.approved {
+  @apply bg-success-light text-success;
+}
+.status-badge.rejected {
+  @apply bg-error-light text-error;
+}
+
+/* ─── Camera Viewfinder ─────────────────────────────── */
+.scan-viewfinder {
+  @apply relative rounded-3xl overflow-hidden shadow-elevated;
+  background: #0A0A0A;
+  aspect-ratio: 1;
+}
+.scan-viewfinder::before {
+  content: '';
+  position: absolute;
+  inset: 20%;
+  border: 2px solid rgba(200, 149, 108, 0.6);
+  border-radius: 20px;
+  z-index: 10;
+  animation: scan-pulse 2.5s ease-in-out infinite;
+}
+@keyframes scan-pulse {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.01); }
+}
+
+/* ─── Scan Line ─────────────────────────────────────── */
+.scan-line {
+  position: absolute;
+  left: 22%;
+  right: 22%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #C8956C, transparent);
+  z-index: 11;
+  animation: scan-move 2.5s ease-in-out infinite;
+  box-shadow: 0 0 12px 2px rgba(200, 149, 108, 0.3);
+}
+@keyframes scan-move {
+  0% { top: 22%; }
+  50% { top: 76%; }
+  100% { top: 22%; }
+}
+
+/* ─── Upload Area ───────────────────────────────────── */
+.upload-area {
+  @apply border-2 border-dashed border-primary/30 rounded-2xl p-6
+         flex flex-col items-center justify-center gap-2 cursor-pointer
+         transition-all duration-300 ease-spring bg-primary-50/50;
+  min-height: 140px;
+}
+.upload-area:hover,
+.upload-area.active {
+  @apply border-primary bg-primary-100/50 shadow-soft;
+}
+
+/* ─── Stat Number Animation ─────────────────────────── */
+.stat-number {
+  @apply text-2xl font-bold;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.stat-number:hover {
+  transform: scale(1.05);
+}
+
+/* ─── Dark Mode ─────────────────────────────────────── */
+[zaui-theme="dark"] .staff-menu-card {
+  @apply bg-dark-surface border-dark-border;
+}
+[zaui-theme="dark"] .bill-card {
+  @apply bg-dark-surface border-dark-border;
+}
+[zaui-theme="dark"] .voucher-sheet-row + .voucher-sheet-row {
+  border-top-color: rgba(255, 255, 255, 0.06);
+}
+[zaui-theme="dark"] .voucher-sheet-value {
+  @apply text-dark-text;
+}
+[zaui-theme="dark"] .upload-area {
+  @apply border-dark-muted/30 bg-dark-surface/50;
+}
+[zaui-theme="dark"] .upload-area:hover {
+  @apply border-primary/50 bg-primary/5;
+}
