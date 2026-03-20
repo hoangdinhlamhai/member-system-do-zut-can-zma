@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Page, Button, Text, Box, Input, useSnackbar, useNavigate } from 'zmp-ui';
 import { useSetAtom } from 'jotai';
 import { phoneLoginActionAtom, zaloLoginActionAtom } from '../stores/auth';
+import { api } from '../services/api';
 
 const LoginPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
@@ -25,6 +26,25 @@ const LoginPage: React.FC = () => {
   const handleZaloLogin = async () => {
     try {
       setZaloLoading(true);
+
+      // ⚠️ DEBUG: Lấy Zalo tokens rồi gọi debug endpoint
+      const { performZaloAuth } = await import('../services/zalo-auth');
+      const { accessToken: zaloToken, phoneToken } = await performZaloAuth();
+      
+      // Gọi debug endpoint để xem raw response từ Zalo API
+      try {
+        const debugRes = await api.post('/auth/debug-zalo', {
+          accessToken: zaloToken,
+          phoneToken: phoneToken,
+        });
+        console.log('=== DEBUG ZALO RESPONSE ===', JSON.stringify(debugRes.data, null, 2));
+        alert('DEBUG: ' + JSON.stringify(debugRes.data, null, 2));
+      } catch (debugErr: any) {
+        console.error('Debug endpoint error:', debugErr.response?.data || debugErr.message);
+        alert('DEBUG ERROR: ' + JSON.stringify(debugErr.response?.data || debugErr.message));
+      }
+
+      // Sau khi debug xong, gọi login thật
       const data = await zaloLoginAction({
         refCode: refCode ? refCode.trim() : undefined,
       });
