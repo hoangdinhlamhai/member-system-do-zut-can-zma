@@ -27,65 +27,42 @@ const LoginPage: React.FC = () => {
     try {
       setZaloLoading(true);
 
-      // ⚠️ DEBUG: Lấy Zalo tokens rồi gọi debug endpoint
-      const { performZaloAuth } = await import('../services/zalo-auth');
-      const { accessToken: zaloToken, phoneToken } = await performZaloAuth();
-      
-      // Gọi debug endpoint để xem raw response từ Zalo API
+      // ⚠️ DEBUG: log từng bước
+      let debugLog = '';
       try {
-        const debugRes = await api.post('/auth/debug-zalo', {
-          accessToken: zaloToken,
-          phoneToken: phoneToken,
+        const { performZaloAuth } = await import('../services/zalo-auth');
+        debugLog += '1. Calling performZaloAuth...\n';
+        const { authCode, codeVerifier } = await performZaloAuth();
+        debugLog += `2. authCode: ${authCode.substring(0, 20)}... (len=${authCode.length})\n`;
+        debugLog += `3. codeVerifier: ${codeVerifier.substring(0, 20)}... (len=${codeVerifier.length})\n`;
+
+        debugLog += '4. Calling backend /auth/zalo-login...\n';
+        const response = await api.post('/auth/zalo-login', {
+          authCode,
+          codeVerifier,
+          refCode: refCode ? refCode.trim() : undefined,
         });
-        console.log('=== DEBUG ZALO RESPONSE ===', JSON.stringify(debugRes.data, null, 2));
-        alert('DEBUG: ' + JSON.stringify(debugRes.data, null, 2));
-      } catch (debugErr: any) {
-        console.error('Debug endpoint error:', debugErr.response?.data || debugErr.message);
-        alert('DEBUG ERROR: ' + JSON.stringify(debugErr.response?.data || debugErr.message));
+        debugLog += `5. SUCCESS: ${JSON.stringify(response.data).substring(0, 200)}\n`;
+        alert('✅ LOGIN OK:\n' + debugLog);
+
+        const data = response.data;
+        localStorage.setItem('accessToken', data.accessToken);
+        localStorage.setItem('userType', 'member');
+        // Update atoms manually since we bypassed zaloLoginAction
+        // Will navigate below
+        navigate('/dashboard', { replace: true, animate: true, direction: 'forward' });
+        return;
+      } catch (innerErr: any) {
+        debugLog += `❌ ERROR at step: ${innerErr?.message}\n`;
+        debugLog += `Response status: ${innerErr?.response?.status}\n`;
+        debugLog += `Response data: ${JSON.stringify(innerErr?.response?.data)}\n`;
+        debugLog += `Error code: ${innerErr?.code}\n`;
+        alert('DEBUG LOG:\n' + debugLog);
+        throw innerErr;
       }
-
-      // Sau khi debug xong, gọi login thật
-      const data = await zaloLoginAction({
-        refCode: refCode ? refCode.trim() : undefined,
-      });
-
-      snackbar.openSnackbar({
-        type: 'success',
-        text: data.isNewUser
-          ? 'Chào mừng bạn đến với Zô Dứt Cạn!'
-          : `Chào mừng trở lại, ${data.member?.zaloName || 'bạn'}!`,
-        duration: 2000,
-      });
-      navigate('/dashboard', { replace: true, animate: true, direction: 'forward' });
     } catch (error: any) {
       console.error('Zalo login error:', error);
-
-      const errorMsg = error?.response?.data?.message || error?.message || '';
-
-      if (errorMsg === 'PHONE_ALREADY_LINKED_TO_OTHER_ZALO_ID') {
-        snackbar.openSnackbar({
-          type: 'error',
-          text: 'Số điện thoại này đã được liên kết với tài khoản Zalo khác. Vui lòng liên hệ cửa hàng.',
-          duration: 5000,
-        });
-      } else if (
-        errorMsg.includes('PERMISSION') ||
-        errorMsg.includes('authorize') ||
-        errorMsg.includes('scope')
-      ) {
-        snackbar.openSnackbar({
-          type: 'error',
-          text: 'Bạn cần cấp quyền để đăng nhập. Vui lòng thử lại.',
-          duration: 3000,
-        });
-      } else {
-        snackbar.openSnackbar({
-          type: 'error',
-          text: 'Đăng nhập Zalo thất bại. Thử đăng nhập bằng SĐT nhé!',
-          duration: 3000,
-        });
-        setShowPhoneLogin(true);
-      }
+      setShowPhoneLogin(true);
     } finally {
       setZaloLoading(false);
     }

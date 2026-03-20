@@ -37,22 +37,22 @@ export const isAuthLoadingAtom = atom<boolean>(true);
 // --- Actions (Derived atoms cho logic) ---
 
 /**
- * Zalo OAuth Login — Flow chính cho ZMA
- * 1. SDK authorize + getAccessToken + getPhoneNumber
- * 2. POST /auth/zalo-login → backend decode phone, create/link member
+ * Zalo OAuth Login — Social API v4 Flow
+ * 1. SDK authorize + getAuthCode → { authCode, codeVerifier }
+ * 2. POST /auth/zalo-login → backend exchange code → get user info → JWT
  * 3. Lưu token + member info
  */
 export const zaloLoginActionAtom = atom(
   null,
   async (get, set, { refCode }: { refCode?: string } = {}) => {
     try {
-      // Step 1: Zalo SDK flow
-      const { accessToken: zaloAccessToken, phoneToken } = await performZaloAuth();
+      // Step 1: Zalo SDK flow → authCode + codeVerifier
+      const { authCode, codeVerifier } = await performZaloAuth();
 
       // Step 2: Gọi backend
       const response = await api.post('/auth/zalo-login', {
-        accessToken: zaloAccessToken,
-        phoneToken,
+        authCode,
+        codeVerifier,
         refCode: refCode || undefined,
       });
 
