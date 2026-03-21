@@ -14,6 +14,8 @@ import ReferralPage from "@/pages/referral";
 import RewardsPage from "@/pages/rewards";
 import QRPage from "@/pages/qr";
 import LoginPage from "@/pages/login";
+import CompleteProfilePage from "@/pages/complete-profile";
+import AddPhonePage from "@/pages/add-phone";
 import BottomNav from "@/components/bottom-nav";
 import AuthGuard from "@/components/auth-guard";
 
@@ -32,6 +34,8 @@ const Layout = () => {
           <AnimationRoutes>
             {/* ══ Public Routes ════════════════════════ */}
             <Route path="/login" element={<LoginPage />}></Route>
+            <Route path="/complete-profile" element={<CompleteProfilePage />}></Route>
+            <Route path="/add-phone" element={<AddPhonePage />}></Route>
             
             {/* ══ Member Routes (User App) ═════════════ */}
             <Route path="/" element={<AuthGuard><HomePage /></AuthGuard>}></Route>

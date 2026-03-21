@@ -1,7 +1,7 @@
 import React from "react";
 import { Page, Box, Button, Text, useNavigate } from "zmp-ui";
-import { useSetAtom } from "jotai";
-import { logoutActionAtom } from "@/stores/auth";
+import { useSetAtom, useAtomValue } from "jotai";
+import { logoutActionAtom, memberAtom } from "@/stores/auth";
 import { useFetchReferees, useFetchDashboard, useFetchTimeline, useDashboardLoading } from "@/hooks/use-member";
 
 import Header from "@/components/header";
@@ -16,6 +16,7 @@ import bg from "@/static/bg.svg";
 function DashboardPage() {
   const logout = useSetAtom(logoutActionAtom);
   const navigate = useNavigate();
+  const member = useAtomValue(memberAtom);
   const { fetchReferees } = useFetchReferees();
   const { fetchDashboard } = useFetchDashboard();
   const { fetchTimeline } = useFetchTimeline();
@@ -72,6 +73,40 @@ function DashboardPage() {
               <TransactionTimeline />
             </>
           )}
+
+          {/* ══ Thông tin cá nhân ══ */}
+          <Box className="px-4 mt-6 animate-slide-up" style={{ animationDelay: '0.25s' }}>
+            <Box className="bg-white dark:bg-dark-card rounded-2xl p-4 shadow-sm border border-gray-100 dark:border-gray-700/30">
+              <Text className="font-semibold text-sm text-text-primary dark:text-white mb-3">
+                👤 Thông tin cá nhân
+              </Text>
+
+              <Box className="space-y-2">
+                {member?.zaloName && (
+                  <Box className="flex justify-between items-center">
+                    <Text className="text-xs text-text-muted dark:text-gray-400">Tên Zalo</Text>
+                    <Text className="text-xs font-medium text-text-primary dark:text-white">{member.zaloName}</Text>
+                  </Box>
+                )}
+
+                <Box className="flex justify-between items-center">
+                  <Text className="text-xs text-text-muted dark:text-gray-400">Số điện thoại</Text>
+                  {member?.phone ? (
+                    <Text className="text-xs font-medium text-text-primary dark:text-white">{member.phone}</Text>
+                  ) : (
+                    <Button
+                      size="small"
+                      variant="tertiary"
+                      className="!text-xs !text-amber-600 dark:!text-amber-400 !px-3 !py-1 !rounded-lg !bg-amber-50 dark:!bg-amber-900/20"
+                      onClick={() => navigate('/add-phone', { animate: true, direction: 'forward' })}
+                    >
+                      + Thêm SĐT
+                    </Button>
+                  )}
+                </Box>
+              </Box>
+            </Box>
+          </Box>
 
           {/* Logout */}
           <Box className="px-4 mt-8 pb-10 animate-slide-up" style={{ animationDelay: '0.3s' }}>

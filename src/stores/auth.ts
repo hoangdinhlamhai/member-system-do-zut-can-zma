@@ -34,23 +34,24 @@ export const userTypeAtom = atom<'member' | 'staff' | null>(initialUserType);
 export const isLoggedInAtom = atom((get) => !!get(tokenAtom) && (!!get(memberAtom) || !!get(staffAtom)));
 export const isAuthLoadingAtom = atom<boolean>(true);
 
-// --- Actions (Derived atoms cho logic) ---
-
 /**
- * Zalo OAuth Login — Social API v4 Flow
- * 1. SDK authorize + getAuthCode → { authCode, codeVerifier }
- * 2. POST /auth/zalo-login → backend exchange code → get user info → JWT
- * 3. Lưu token + member info
+ * Zalo OAuth Login — Frontend getUserInfo + Backend verification
+ * 1. SDK getUserInfo() → { zaloId, name, avatar } (client-side, direct)
+ * 2. SDK getAuthCode() → { authCode, codeVerifier } (for backend verification)
+ * 3. POST /auth/zalo-login → backend verifies auth + creates/finds member → JWT
  */
 export const zaloLoginActionAtom = atom(
   null,
   async (get, set, { refCode }: { refCode?: string } = {}) => {
     try {
-      // Step 1: Zalo SDK flow → authCode + codeVerifier
-      const { authCode, codeVerifier } = await performZaloAuth();
+      // Step 1: Zalo SDK → userInfo (direct) + authCode (for verification)
+      const { authCode, codeVerifier, userInfo } = await performZaloAuth();
 
-      // Step 2: Gọi backend
+      // Step 2: Gọi backend with user info from frontend
       const response = await api.post('/auth/zalo-login', {
+        zaloId: userInfo.zaloId,
+        zaloName: userInfo.zaloName,
+        zaloAvatar: userInfo.zaloAvatar,
         authCode,
         codeVerifier,
         refCode: refCode || undefined,
@@ -58,7 +59,7 @@ export const zaloLoginActionAtom = atom(
 
       const data = response.data;
 
-      // Step 3: Lưu state (Zalo login luôn là member)
+      // Step 3: Lưu state
       localStorage.setItem('accessToken', data.accessToken);
       localStorage.setItem('userType', 'member');
 
@@ -67,9 +68,9 @@ export const zaloLoginActionAtom = atom(
       set(memberAtom, data.member);
       set(staffAtom, null);
 
-      return data; // { accessToken, userType: 'member', member, isNewUser }
+      return data;
     } catch (error) {
-      console.error('Lỗi Zalo OAuth login:', error);
+      console.error('Zalo login error:', error);
       throw error;
     }
   }

@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Page, Button, Text, Box, Input, useSnackbar, useNavigate } from 'zmp-ui';
 import { useSetAtom } from 'jotai';
-import { phoneLoginActionAtom, zaloLoginActionAtom } from '../stores/auth';
+import { phoneLoginActionAtom, zaloLoginActionAtom, tokenAtom, memberAtom } from '../stores/auth';
 import { api } from '../services/api';
+
 
 const LoginPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
@@ -11,6 +12,8 @@ const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const phoneLoginAction = useSetAtom(phoneLoginActionAtom);
   const zaloLoginAction = useSetAtom(zaloLoginActionAtom);
+  const setToken = useSetAtom(tokenAtom);
+  const setMember = useSetAtom(memberAtom);
   const [phone, setPhone] = useState('');
   const [refCode, setRefCode] = useState('');
   const [phoneError, setPhoneError] = useState('');
@@ -22,47 +25,52 @@ const LoginPage: React.FC = () => {
     if (urlRef) setRefCode(urlRef);
   }, []);
 
-  // ═══ Zalo OAuth Login ═══
+  // ═══ Zalo Login ═══
   const handleZaloLogin = async () => {
     try {
       setZaloLoading(true);
 
-      // ⚠️ DEBUG: log từng bước
-      let debugLog = '';
-      try {
-        const { performZaloAuth } = await import('../services/zalo-auth');
-        debugLog += '1. Calling performZaloAuth...\n';
-        const { authCode, codeVerifier } = await performZaloAuth();
-        debugLog += `2. authCode: ${authCode.substring(0, 20)}... (len=${authCode.length})\n`;
-        debugLog += `3. codeVerifier: ${codeVerifier.substring(0, 20)}... (len=${codeVerifier.length})\n`;
+      const { performZaloAuth } = await import('../services/zalo-auth');
+      const authResult = await performZaloAuth();
 
-        debugLog += '4. Calling backend /auth/zalo-login...\n';
-        const response = await api.post('/auth/zalo-login', {
-          authCode,
-          codeVerifier,
-          refCode: refCode ? refCode.trim() : undefined,
+      const response = await api.post('/auth/zalo-login', {
+        zaloId: authResult.userInfo.zaloId,
+        zaloName: authResult.userInfo.zaloName,
+        zaloAvatar: authResult.userInfo.zaloAvatar,
+        authCode: authResult.authCode,
+        codeVerifier: authResult.codeVerifier,
+        refCode: refCode?.trim() || undefined,
+      });
+
+      const data = response.data;
+      localStorage.setItem('accessToken', data.accessToken);
+      localStorage.setItem('userType', 'member');
+      setToken(data.accessToken);
+      setMember(data.member);
+
+      if (data.isNewUser) {
+        snackbar.openSnackbar({
+          type: 'success',
+          text: 'Chào mừng bạn đến với Zô Dứt Cạn! 🎉',
+          duration: 2000,
         });
-        debugLog += `5. SUCCESS: ${JSON.stringify(response.data).substring(0, 200)}\n`;
-        alert('✅ LOGIN OK:\n' + debugLog);
-
-        const data = response.data;
-        localStorage.setItem('accessToken', data.accessToken);
-        localStorage.setItem('userType', 'member');
-        // Update atoms manually since we bypassed zaloLoginAction
-        // Will navigate below
+        navigate('/complete-profile', { replace: true, animate: true, direction: 'forward' });
+      } else {
+        snackbar.openSnackbar({
+          type: 'success',
+          text: 'Đăng nhập thành công!',
+          duration: 2000,
+        });
         navigate('/dashboard', { replace: true, animate: true, direction: 'forward' });
-        return;
-      } catch (innerErr: any) {
-        debugLog += `❌ ERROR at step: ${innerErr?.message}\n`;
-        debugLog += `Response status: ${innerErr?.response?.status}\n`;
-        debugLog += `Response data: ${JSON.stringify(innerErr?.response?.data)}\n`;
-        debugLog += `Error code: ${innerErr?.code}\n`;
-        alert('DEBUG LOG:\n' + debugLog);
-        throw innerErr;
       }
     } catch (error: any) {
       console.error('Zalo login error:', error);
       setShowPhoneLogin(true);
+      snackbar.openSnackbar({
+        type: 'error',
+        text: 'Đăng nhập Zalo thất bại. Thử bằng SĐT nhé!',
+        duration: 3000,
+      });
     } finally {
       setZaloLoading(false);
     }
@@ -195,7 +203,7 @@ const LoginPage: React.FC = () => {
             </Button>
 
             <Text className="text-text-muted/50 text-xs text-center mb-3">
-              Tự động xác thực SĐT, không cần nhập gì
+              Đăng nhập nhanh, không cần nhập gì
             </Text>
 
             {/* ═══ Divider ═══ */}
