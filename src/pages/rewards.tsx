@@ -28,14 +28,14 @@ function RewardsPage() {
   }, []);
 
   return (
-    <Page className="page pb-[120px] relative overflow-x-hidden min-h-screen bg-cream dark:bg-dark-bg">
+    <Page className="page page-content relative overflow-x-hidden min-h-screen bg-cream dark:bg-dark-bg">
       <Box
         className="absolute top-0 left-0 right-0 h-[320px] bg-cover bg-bottom opacity-[0.06] dark:opacity-[0.03] z-0 pointer-events-none"
         style={{ backgroundImage: `url(${bg})` }}
       />
       <Header />
 
-      <Box className="relative z-10 w-full max-w-md mx-auto pt-[82px]">
+      <Box className="relative z-10 w-full max-w-md mx-auto pt-2">
         {/* Points Display */}
         <Box className="px-4 py-4 mb-3 flex flex-col items-center animate-fade-in">
           <Text className="text-sm font-medium text-text-muted dark:text-dark-muted mb-1.5">Điểm hiện có</Text>

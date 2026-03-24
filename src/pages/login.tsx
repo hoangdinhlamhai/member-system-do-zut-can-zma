@@ -20,9 +20,17 @@ const LoginPage: React.FC = () => {
   const [showPhoneLogin, setShowPhoneLogin] = useState(false);
 
   useEffect(() => {
+    // Read ref from URL query params (direct link) or localStorage (via AuthGuard redirect)
     const searchParams = new URLSearchParams(window.location.search);
     const urlRef = searchParams.get('ref');
-    if (urlRef) setRefCode(urlRef);
+    const pendingRef = localStorage.getItem('pendingRefCode');
+    
+    const ref = urlRef || pendingRef || '';
+    if (ref) {
+      setRefCode(ref);
+      // Clean up so it doesn't persist across sessions
+      localStorage.removeItem('pendingRefCode');
+    }
   }, []);
 
   // ═══ Zalo Login ═══

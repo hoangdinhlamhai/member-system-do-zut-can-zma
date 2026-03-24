@@ -42,7 +42,7 @@ function DashboardPage() {
   };
 
   return (
-    <Page className="page pb-[120px] relative overflow-x-hidden min-h-screen bg-cream dark:bg-dark-bg">
+    <Page className="page page-content relative overflow-x-hidden min-h-screen bg-cream dark:bg-dark-bg">
       {/* Background decoration */}
       <Box
         className="absolute top-0 left-0 right-0 h-[320px] bg-cover bg-bottom opacity-[0.06] dark:opacity-[0.03] z-0 pointer-events-none"
@@ -51,11 +51,11 @@ function DashboardPage() {
 
       <Header />
 
-      <Box className="relative z-10 w-full max-w-md mx-auto">
+      <Box className="relative z-10 w-full max-w-md mx-auto pt-2">
         <Box id="dashboard-section" className="pb-4">
           {isLoading ? (
             // Loading skeleton
-            <Box className="px-4 pt-[88px] space-y-4">
+            <Box className="px-4 space-y-4">
               <Box className="animate-pulse space-y-3">
                 <Box className="h-5 w-32 bg-gray-200 dark:bg-dark-card rounded" />
                 <Box className="h-7 w-48 bg-gray-200 dark:bg-dark-card rounded" />

@@ -24,7 +24,13 @@ const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
     if (isLoading) return;
 
     // Nếu không đăng nhập, đẩy về '/login'
+    // Preserve ?ref= param from deep link (QR referral) so login page can use it
     if (!isLoggedIn) {
+      const searchParams = new URLSearchParams(window.location.search);
+      const refCode = searchParams.get('ref');
+      if (refCode) {
+        localStorage.setItem('pendingRefCode', refCode);
+      }
       navigate('/login', { replace: true, direction: 'backward' });
       return;
     }

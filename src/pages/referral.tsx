@@ -19,7 +19,7 @@ function ReferralPage() {
   }, [fetchReferees]);
 
   return (
-    <Page className="page pb-[120px] relative overflow-x-hidden min-h-screen bg-cream dark:bg-dark-bg">
+    <Page className="page page-content relative overflow-x-hidden min-h-screen bg-cream dark:bg-dark-bg">
       <Box
         className="absolute top-0 left-0 right-0 h-[320px] bg-cover bg-bottom opacity-[0.06] dark:opacity-[0.03] z-0 pointer-events-none"
         style={{ backgroundImage: `url(${bg})` }}

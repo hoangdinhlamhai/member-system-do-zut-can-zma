@@ -36,7 +36,7 @@ const TierInfoCard: React.FC = () => {
   const isMaxTier = nextSpending <= 0;
 
   return (
-    <Box className="px-4 pt-[88px] animate-slide-up">
+    <Box className="px-4 animate-slide-up">
       {/* Greeting */}
       <Box className="mb-3">
         <Text className="text-base text-text-muted dark:text-dark-muted font-medium">

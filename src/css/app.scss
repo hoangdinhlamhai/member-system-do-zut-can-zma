@@ -18,6 +18,12 @@ body {
   @apply p-0;
 }
 
+/* Content container — proper spacing for fixed header + bottom nav */
+.page-content {
+  padding-top: var(--header-height);
+  padding-bottom: var(--bottom-nav-height);
+}
+
 /* ─── Glass Effect ──────────────────────────────────── */
 .glass-effect {
   @apply bg-white/80 border border-white/40 shadow-soft;
