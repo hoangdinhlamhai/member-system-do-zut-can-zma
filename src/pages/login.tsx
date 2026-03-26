@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Page, Button, Text, Box, Input, useSnackbar, useNavigate } from 'zmp-ui';
+import { Page, Button, Text, Box, Input, useNavigate } from 'zmp-ui';
 import { useSetAtom } from 'jotai';
 import { phoneLoginActionAtom, zaloLoginActionAtom, tokenAtom, memberAtom } from '../stores/auth';
 import { api } from '../services/api';
+import { sileo } from 'sileo';
 
 
 const LoginPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [zaloLoading, setZaloLoading] = useState(false);
-  const snackbar = useSnackbar();
+
   const navigate = useNavigate();
   const phoneLoginAction = useSetAtom(phoneLoginActionAtom);
   const zaloLoginAction = useSetAtom(zaloLoginActionAtom);
@@ -57,26 +58,26 @@ const LoginPage: React.FC = () => {
       setMember(data.member);
 
       if (data.isNewUser) {
-        snackbar.openSnackbar({
-          type: 'success',
-          text: 'Chào mừng bạn đến với Zô Dứt Cạn! 🎉',
-          duration: 2000,
+        sileo.success({
+          title: 'Chào mừng! 🎉',
+          description: 'Bạn đã đăng ký thành công Zô Dứt Cạn',
+          duration: 3000,
         });
         navigate('/complete-profile', { replace: true, animate: true, direction: 'forward' });
       } else {
-        snackbar.openSnackbar({
-          type: 'success',
-          text: 'Đăng nhập thành công!',
-          duration: 2000,
+        sileo.success({
+          title: 'Đăng nhập thành công! ✅',
+          description: 'Chào mừng bạn quay lại',
+          duration: 2500,
         });
         navigate('/dashboard', { replace: true, animate: true, direction: 'forward' });
       }
     } catch (error: any) {
       console.error('Zalo login error:', error);
       setShowPhoneLogin(true);
-      snackbar.openSnackbar({
-        type: 'error',
-        text: 'Đăng nhập Zalo thất bại. Thử bằng SĐT nhé!',
+      sileo.error({
+        title: 'Đăng nhập Zalo thất bại',
+        description: 'Thử đăng nhập bằng SĐT nhé!',
         duration: 3000,
       });
     } finally {
@@ -101,25 +102,25 @@ const LoginPage: React.FC = () => {
       });
 
       if (data.userType === 'staff') {
-        snackbar.openSnackbar({
-          type: 'success',
-          text: `Xin chào ${data.staff?.fullName || 'Nhân viên'}!`,
-          duration: 2000,
+        sileo.success({
+          title: `Xin chào ${data.staff?.fullName || 'Nhân viên'}! 👋`,
+          description: 'Đăng nhập nhân viên thành công',
+          duration: 2500,
         });
         navigate('/staff', { replace: true, animate: true, direction: 'forward' });
       } else {
-        snackbar.openSnackbar({
-          type: 'success',
-          text: data.isNewUser ? 'Chào mừng bạn đến với Zô Dứt Cạn!' : 'Đăng nhập thành công!',
-          duration: 2000,
+        sileo.success({
+          title: data.isNewUser ? 'Chào mừng! 🎉' : 'Đăng nhập thành công! ✅',
+          description: data.isNewUser ? 'Bạn đã đăng ký thành công Zô Dứt Cạn' : 'Chào mừng bạn quay lại',
+          duration: 2500,
         });
         navigate('/dashboard', { replace: true, animate: true, direction: 'forward' });
       }
     } catch (error: any) {
-      const errorMsg = error.response?.data?.message || 'Đăng nhập thất bại. Vui lòng thử lại!';
-      snackbar.openSnackbar({
-        type: 'error',
-        text: errorMsg,
+      const errorMsg = error.response?.data?.message || 'Vui lòng thử lại!';
+      sileo.error({
+        title: 'Đăng nhập thất bại',
+        description: errorMsg,
         duration: 3000,
       });
     } finally {

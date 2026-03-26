@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Box, Text, Modal } from 'zmp-ui';
+import { Box, Text } from 'zmp-ui';
+import { QRCodeSVG } from 'qrcode.react';
 import { useVouchers } from '../../hooks/use-member';
 
 const formatDate = (dateString: string) => {
@@ -7,9 +8,16 @@ const formatDate = (dateString: string) => {
   return `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`;
 };
 
+interface QRModalState {
+  visible: boolean;
+  qrData: string;
+  title: string;
+  code: string;
+}
+
 const MyVouchersTab: React.FC = () => {
   const { vouchers } = useVouchers();
-  const [qrModalData, setQrModalData] = useState<{ visible: boolean; qrData: string; title: string; code: string }>({
+  const [qrModal, setQrModal] = useState<QRModalState>({
     visible: false,
     qrData: '',
     title: '',
@@ -28,7 +36,11 @@ const MyVouchersTab: React.FC = () => {
   }
 
   const openQR = (v: any) => {
-    setQrModalData({ visible: true, qrData: v.qrData, title: v.title, code: v.voucherCode });
+    setQrModal({ visible: true, qrData: v.qrData, title: v.title, code: v.voucherCode });
+  };
+
+  const closeQR = () => {
+    setQrModal((prev) => ({ ...prev, visible: false }));
   };
 
   return (
@@ -100,30 +112,85 @@ const MyVouchersTab: React.FC = () => {
         })}
       </Box>
 
-      {/* QR Modal */}
-      <Modal
-        visible={qrModalData.visible}
-        title="Đưa mã này cho thu ngân"
-        onClose={() => setQrModalData({ ...qrModalData, visible: false })}
-        actions={[{ text: 'Đóng', close: true, highLight: true }]}
-      >
-        <Box className="text-center py-4 flex flex-col items-center justify-center">
-          <Text className="text-base text-text-main dark:text-dark-text font-bold mb-2">
-            {qrModalData.title}
-          </Text>
-          <Text className="text-lg font-mono text-primary font-bold mb-5 bg-primary-50 dark:bg-primary/10 px-5 py-1.5 rounded-xl border border-primary/15 tracking-[0.15em]">
-            {qrModalData.code}
-          </Text>
+      {/* QR Overlay — tap outside to close */}
+      {qrModal.visible && (
+        <div
+          className="fixed inset-0 z-[9999] flex items-center justify-center"
+          style={{ animation: 'fadeIn 0.2s ease-out' }}
+        >
+          {/* Backdrop — tap to close */}
+          <div
+            className="absolute inset-0 bg-black/60"
+            style={{ backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)' }}
+            onClick={closeQR}
+            onTouchEnd={(e) => { e.preventDefault(); closeQR(); }}
+          />
 
-          <Box className="bg-white dark:bg-dark-surface p-4 rounded-2xl shadow-soft border border-black/[0.04] dark:border-dark-border inline-block mb-3">
-            <Box className="w-48 h-48 bg-cream dark:bg-dark-card rounded-xl flex items-center justify-center bg-[url('https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=ZDC:VOUCHER')] bg-contain bg-center" />
-          </Box>
+          {/* QR Card */}
+          <div
+            className="relative z-10 w-[85%] max-w-[320px] bg-white dark:bg-dark-surface rounded-3xl shadow-elevated overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+            onTouchEnd={(e) => e.stopPropagation()}
+            style={{ animation: 'slideUp 0.3s ease-out' }}
+          >
+            {/* Header gradient */}
+            <Box
+              className="px-6 pt-6 pb-4 text-center text-white"
+              style={{ background: 'var(--gradient-primary)' }}
+            >
+              <Text className="text-xs font-medium text-white/70 uppercase tracking-widest mb-1">
+                Đưa mã này cho thu ngân
+              </Text>
+              <Text className="text-base font-bold text-white">
+                {qrModal.title}
+              </Text>
+            </Box>
 
-          <Text className="text-xs text-text-muted/60 dark:text-dark-muted/60 mt-2">
-            Mã QR tự động làm mới mỗi 30 giây để bảo mật
-          </Text>
-        </Box>
-      </Modal>
+            {/* QR Code */}
+            <Box className="px-6 py-6 flex flex-col items-center">
+              <Box className="bg-white p-4 rounded-2xl shadow-soft border border-black/[0.04] mb-4">
+                <QRCodeSVG
+                  value={qrModal.qrData}
+                  size={200}
+                  bgColor="#FFFFFF"
+                  fgColor="#2E2722"
+                  level="M"
+                  includeMargin={false}
+                />
+              </Box>
+
+              <Text className="text-lg font-mono font-bold text-primary bg-primary-50 dark:bg-primary/10 px-5 py-2 rounded-xl border border-primary/15 tracking-[0.15em] mb-2">
+                {qrModal.code}
+              </Text>
+
+              <Text className="text-[11px] text-text-muted/50 dark:text-dark-muted/50 mt-1 mb-3">
+                Nhấn vùng trống để đóng
+              </Text>
+
+              <div
+                className="w-full py-3 text-center text-sm font-bold text-white rounded-xl cursor-pointer active:opacity-80 transition-opacity"
+                style={{ background: 'var(--gradient-primary)' }}
+                onClick={closeQR}
+                onTouchEnd={(e) => { e.preventDefault(); closeQR(); }}
+              >
+                Đóng
+              </div>
+            </Box>
+          </div>
+        </div>
+      )}
+
+      {/* Animations */}
+      <style>{`
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes slideUp {
+          from { opacity: 0; transform: scale(0.9) translateY(20px); }
+          to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+      `}</style>
     </Box>
   );
 };

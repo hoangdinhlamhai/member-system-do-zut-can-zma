@@ -7,6 +7,8 @@ import {
   ZMPRouter,
 } from "zmp-ui";
 import { AppProps } from "zmp-ui/app";
+import { Toaster } from "sileo";
+import "sileo/styles.css";
 
 import HomePage from "@/pages/index";
 import DashboardPage from "@/pages/dashboard";
@@ -53,6 +55,7 @@ const Layout = () => {
           <BottomNav />
         </ZMPRouter>
       </SnackbarProvider>
+      <Toaster position="top-center" theme="system" offset={{ top: 60 }} />
     </App>
   );
 };
