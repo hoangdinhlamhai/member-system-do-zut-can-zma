@@ -1,6 +1,7 @@
 import React from "react";
 import { Page, Box, Button, Text, useNavigate } from "zmp-ui";
 import { useSetAtom, useAtomValue } from "jotai";
+import { openChat } from "zmp-sdk";
 import { logoutActionAtom, memberAtom } from "@/stores/auth";
 import { useFetchReferees, useFetchDashboard, useFetchTimeline, useDashboardLoading } from "@/hooks/use-member";
 
@@ -12,6 +13,9 @@ import F1DetailsList from "@/components/dashboard/f1-details";
 import TransactionTimeline from "@/components/dashboard/transaction-timeline";
 
 import bg from "@/static/bg.svg";
+
+/** OA ID của Zô Dứt Cạn (lấy từ Zalo OA Dashboard) */
+const ZDC_OA_ID = "162641867055414153";
 
 function DashboardPage() {
   const logout = useSetAtom(logoutActionAtom);
@@ -39,6 +43,14 @@ function DashboardPage() {
   const handleLogout = () => {
     logout();
     navigate("/login", { replace: true, animate: true, direction: "forward" });
+  };
+
+  const handleOpenChatbot = () => {
+    openChat({
+      type: "oa",
+      id: ZDC_OA_ID,
+      message: "doanh số",
+    });
   };
 
   return (
@@ -106,6 +118,33 @@ function DashboardPage() {
                 </Box>
               </Box>
             </Box>
+          </Box>
+
+          {/* ══ Chatbot Zalo OA ══ */}
+          <Box className="px-4 mt-4 animate-slide-up" style={{ animationDelay: '0.28s' }}>
+            <button
+              onClick={handleOpenChatbot}
+              className="w-full flex items-center gap-3 p-4 rounded-2xl shadow-sm border border-amber-200/60 dark:border-amber-700/30 transition-all active:scale-[0.98]"
+              style={{
+                background: 'linear-gradient(135deg, #FFF7ED 0%, #FFEDD5 50%, #FED7AA 100%)',
+              }}
+            >
+              <Box
+                className="w-10 h-10 rounded-xl flex items-center justify-center text-lg shrink-0"
+                style={{ background: 'linear-gradient(135deg, #F59E0B, #EA580C)' }}
+              >
+                🤖
+              </Box>
+              <Box className="flex-1 text-left">
+                <Text className="text-sm font-semibold text-amber-900">
+                  Xem doanh số qua Chatbot
+                </Text>
+                <Text className="text-[11px] text-amber-700/70 mt-0.5">
+                  Nhắn tin cho OA để xem báo cáo nhanh
+                </Text>
+              </Box>
+              <Text className="text-amber-500 text-lg">›</Text>
+            </button>
           </Box>
 
           {/* Logout */}
