@@ -1,6 +1,8 @@
 import React from 'react';
-import { Box, Text } from 'zmp-ui';
+import { Box, Text, useNavigate } from 'zmp-ui';
 import { useTimeline } from '../../hooks/use-member';
+
+const DASHBOARD_LIMIT = 3;
 
 const formatVND = (amount: number) => {
   if (amount >= 1000000) return (amount / 1000000).toFixed(1) + 'M';
@@ -15,6 +17,7 @@ const formatDateDayMonth = (dateString: string) => {
 
 const TransactionTimeline: React.FC = () => {
   const { timeline, isLoading } = useTimeline();
+  const navigate = useNavigate();
 
   if (isLoading) {
     return (
@@ -46,6 +49,9 @@ const TransactionTimeline: React.FC = () => {
     );
   }
 
+  const previewItems = timeline.slice(0, DASHBOARD_LIMIT);
+  const hasMore = timeline.length > DASHBOARD_LIMIT;
+
   return (
     <Box className="px-4 mt-4 animate-slide-up pb-4" style={{ animationDelay: '0.4s' }}>
       <Box className="bg-white dark:bg-dark-surface p-5 rounded-2xl shadow-soft border border-black/[0.03] dark:border-dark-border relative">
@@ -57,7 +63,7 @@ const TransactionTimeline: React.FC = () => {
           {/* Timeline line */}
           <div className="absolute left-[9px] top-2 bottom-4 w-[2px] bg-primary/10 dark:bg-primary/5 z-0 rounded-full" />
 
-          {timeline.map((item, index) => {
+          {previewItems.map((item, index) => {
             if (item.type === 'personal_bill') {
               return (
                 <Box key={item.id} className="relative z-10 mb-4 last:mb-0 animate-slide-up" style={{ animationDelay: `${0.4 + index * 0.05}s` }}>
@@ -113,6 +119,19 @@ const TransactionTimeline: React.FC = () => {
             return null;
           })}
         </Box>
+
+        {/* "Xem tất cả" link */}
+        {hasMore && (
+          <button
+            onClick={() => navigate('/transaction-history', { animate: true, direction: 'forward' })}
+            className="w-full mt-4 pt-3 border-t border-black/[0.04] dark:border-dark-border flex items-center justify-center gap-1.5 group"
+          >
+            <Text className="text-xs font-semibold text-primary group-active:opacity-70 transition-opacity">
+              Xem tất cả
+            </Text>
+            <Text className="text-primary text-xs group-active:translate-x-0.5 transition-transform">→</Text>
+          </button>
+        )}
       </Box>
     </Box>
   );

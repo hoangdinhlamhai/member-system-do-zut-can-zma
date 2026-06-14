@@ -18,6 +18,7 @@ import QRPage from "@/pages/qr";
 import LoginPage from "@/pages/login";
 import CompleteProfilePage from "@/pages/complete-profile";
 import AddPhonePage from "@/pages/add-phone";
+import TransactionHistoryPage from "@/pages/transaction-history";
 import BottomNav from "@/components/bottom-nav";
 import AuthGuard from "@/components/auth-guard";
 
@@ -45,6 +46,7 @@ const Layout = () => {
             <Route path="/referral" element={<AuthGuard><ReferralPage /></AuthGuard>}></Route>
             <Route path="/rewards" element={<AuthGuard><RewardsPage /></AuthGuard>}></Route>
             <Route path="/qr" element={<AuthGuard><QRPage /></AuthGuard>}></Route>
+            <Route path="/transaction-history" element={<AuthGuard><TransactionHistoryPage /></AuthGuard>}></Route>
 
             {/* ══ Staff Routes (Staff App) ═════════════ */}
             <Route path="/staff" element={<StaffHomePage />}></Route>
